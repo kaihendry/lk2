@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>lk2</title>
+<script src="/vue"></script>
+</head>
+<body>
+
+<div id="app">
+	<input type="checkbox" id="checkbox" v-model="allowSelections">
+	<label for="checkbox">Allow selections</label>
+
+
+	<label><input type="checkbox" v-model="selectAll">Select all</label>
+	<button @click="trash">Trash {{ checkedVideos.length }}</button>
+
+	<section v-bind:class="{ selectmode: allowSelections }" class=media>
+		<figure v-for="video in videos">
+			<label>
+				<input type="checkbox" :value="video" v-model="checkedVideos">
+				<video v-if="video.ext === '.mp4'" :title="video.size" preload=none :poster="video.filename | thumb" controls :src="video.filename | prefix"></video>
+				<a v-else target="_blank" :title="video.size" :href="video.filename | prefix"><img :src="video.filename | thumb"></a>
+			</label>
+		</figure>
+	</section>
+
+	<p>
+	{{ checkedVideos }}
+	</p>
+
+</div>
+
+<script>
+const prefix = val => {
+	// console.log("HERE", val)
+	return 'o/' + val
+}
+const thumb = val => {
+	return 't/' + val
+}
+const videotype = val => {
+	return true
+}
+new Vue({
+	el: '#app',
+	data: {
+		allowSelections: false,
+		videos: [],
+		checkedVideos: []
+	},
+	computed: {
+		selectAll: {
+			get: function() {
+				return this.videos ? this.checkedVideos.length === this.videos.length : false
+			},
+			set: function(value) {
+				var checkedVideos = []
+				if (value) {
+					this.videos.forEach(function(item) {
+						checkedVideos.push(item)
+					})
+				}
+				this.checkedVideos = checkedVideos
+			}
+		}
+	},
+	created: function() {
+		this.goGet()
+	},
+	methods: {
+		async goGet () {
+			var response = await fetch("/get");
+			this.videos = await response.json();
+		},
+		trash () {
+			console.log("Removing", this.checkedVideos, "from", this.videos)
+			fetch("/", {
+				method: "delete",
+				body: JSON.stringify(this.checkedVideos)
+			  })
+		}
+	},
+	filters: { prefix, videotype, thumb }
+})
+</script>
+<style>
+.media {
+	padding: .5vw;
+	flex-flow: row wrap;
+	display: flex;
+}
+
+.media figure * {
+	width: 100%;
+	height: auto;
+}
+
+.media figure {
+	flex: auto;
+	width: 230px;
+	margin: .5vw;
+}
+
+.selectmode label video {
+	pointer-events: none;
+	border: thick solid #fff;
+}
+
+.selectmode label a img {
+	pointer-events: none;
+	border: thick solid #fff;
+}
+
+.media label {
+	display: block;
+}
+
+.selectmode label input {
+	pointer-events: none;
+	position: absolute;
+	opacity: 0;
+}
+
+.media label input:checked + video {
+	border-color: blue;
+}
+
+.media label input:checked + a img {
+	border-color: blue;
+}
+
+@media screen and (max-width: 400px) {
+  .media figure {
+	  margin: 0;
+  }
+  .media {
+	  padding: 0;
+  }
+}
+</style>
+</body>
+</html>
