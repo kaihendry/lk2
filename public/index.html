@@ -14,15 +14,17 @@
 	<label><input type="checkbox" v-model="selectAll">Select all</label>
 	<button @click="trash">Trash {{ checkedVideos.length }}</button>
 
-	<section v-bind:class="{ selectmode: allowSelections }" class=media>
-		<figure v-for="video in videos">
+
+ <transition-group name="list" tag="section" v-bind:class="{ selectmode: allowSelections }" class=media>
+               <figure v-for="video in videos" v-bind:key="video.filename">
+
 			<label>
 				<input type="checkbox" :value="video" v-model="checkedVideos">
 				<video v-if="video.ext === '.mp4'" :title="video.size" preload=none :poster="video.filename | thumb" controls :src="video.filename | prefix"></video>
 				<a v-else target="_blank" :title="video.size" :href="video.filename | prefix"><img :src="video.filename | thumb"></a>
 			</label>
 		</figure>
-	</section>
+	</transition-group>
 
 	<p>
 	{{ checkedVideos }}
@@ -139,6 +141,14 @@ new Vue({
 	  padding: 0;
   }
 }
+
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
 </style>
 </body>
 </html>
