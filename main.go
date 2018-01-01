@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"image/jpeg"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -280,14 +281,7 @@ func trash(w http.ResponseWriter, r *http.Request) {
 			"dest": trashPath,
 		}).Info("trash")
 
-		dir, _ := filepath.Split(trashPath)
-		err = os.MkdirAll(dir, 0700)
-		if err != nil {
-			http.Error(w, err.Error(), 400)
-			return
-		}
-
-		err = os.Rename(v.Filename, trashPath)
+		err = movefile(v.Filename, trashPath)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
@@ -300,4 +294,41 @@ func trash(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(m)
 	return
 
+}
+
+func movefile(source string, dest string) error {
+	os.MkdirAll(path.Dir(dest), 0700)
+
+	// First try renaming the file
+	if err := os.Rename(source, dest); err == nil {
+		return nil
+	}
+
+	// Try copy instead
+	fr, err := os.Open(source)
+
+	if err != nil {
+		return err
+	}
+
+	defer fr.Close()
+
+	fw, err := os.Create(dest)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(fw, fr)
+
+	fw.Close()
+
+	// Remove source after copy
+	fr.Close()
+
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(source)
 }
