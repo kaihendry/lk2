@@ -78,6 +78,8 @@ new Vue({
 				method: "delete",
 				body: JSON.stringify(this.checkedVideos)
 			  })
+			  this.videos = this.videos.filter(item => !this.checkedVideos.includes(item))
+			  this.checkedVideos = []
 		}
 	},
 	filters: { prefix, videotype, thumb }
