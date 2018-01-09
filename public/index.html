@@ -6,14 +6,14 @@
 </head>
 <body>
 
-<div id="app">
+<div id="app" @keyup.delete="trash">
 	<input type="checkbox" id="checkbox" v-model="allowSelections">
 	<label for="checkbox">Allow selections</label>
 
 
 	<label><input type="checkbox" v-model="selectAll">Select all</label>
 	<button @click="trash">Trash {{ checkedVideos.length }}</button>
-
+	<button @click="del">Delete {{ checkedVideos.length }}</button>
 
  <transition-group name="list" tag="section" v-bind:class="{ selectmode: allowSelections }" class=media>
                <figure v-for="video in videos" v-bind:key="video.filename">
@@ -75,7 +75,16 @@ new Vue({
 			this.videos = await response.json();
 		},
 		trash () {
-			console.log("Removing", this.checkedVideos, "from", this.videos)
+			console.log("trashing", this.checkedVideos, "from", this.videos)
+			fetch("/trash", {
+				method: "POST",
+				body: JSON.stringify(this.checkedVideos)
+			  })
+			  this.videos = this.videos.filter(item => !this.checkedVideos.includes(item))
+			  this.checkedVideos = []
+		},
+		del () {
+			console.log("Deleting", this.checkedVideos, "from", this.videos)
 			fetch("/", {
 				method: "delete",
 				body: JSON.stringify(this.checkedVideos)

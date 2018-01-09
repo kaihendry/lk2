@@ -26,12 +26,14 @@ import (
 	"github.com/nfnt/resize"
 	"github.com/pyk/byten"
 	"github.com/rakyll/statik/fs"
+	"github.com/skratchdot/open-golang/open"
 )
 
 var dirPath = "."
 var dirThumbs = fmt.Sprintf("%s%s", os.Getenv("HOME"), "/.cache/lk")
 var dirTrash = fmt.Sprintf("%s%s", os.Getenv("HOME"), "/.Trash")
 var port = flag.Int("port", 0, "listen port")
+var openbrowser = flag.Bool("openbrowser", true, "Open in browser")
 
 type media struct {
 	Filename string `json:"filename"`
@@ -69,7 +71,8 @@ func main() {
 
 	app.Get("/get", get)
 	app.Get("/t/", thumb)
-	app.Delete("/", trash)
+	app.Post("/trash", trash)
+	app.Delete("/", delete)
 
 	directory := flag.Arg(0)
 	dirPath, _ = filepath.Abs(directory)
@@ -97,6 +100,10 @@ func main() {
 	if a, ok := ln.Addr().(*net.TCPAddr); ok {
 		host := fmt.Sprintf("http://%s:%d", hostname(), a.Port)
 		fmt.Println("Serving from", host)
+		if *openbrowser {
+			open.Start(host)
+		}
+
 	}
 	if err := http.Serve(ln, app); err != nil {
 		log.WithError(err).Fatal("Failed to serve")
@@ -256,6 +263,39 @@ func genJPGthumb(src string, dst string) (err error) {
 	jpeg.Encode(out, m, nil)
 
 	return
+}
+
+func delete(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var m []media
+	err := decoder.Decode(&m)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	defer r.Body.Close()
+
+	log.WithFields(log.Fields{
+		"m": m,
+	}).Info("delete")
+
+	for _, v := range m {
+
+		err = os.Remove(v.Filename)
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(m)
+	return
+
 }
 
 func trash(w http.ResponseWriter, r *http.Request) {
