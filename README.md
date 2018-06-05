@@ -1,3 +1,9 @@
+# Install
+
+	curl -sfL https://install.goreleaser.com/github.com/kaihendry/lk2.sh | sh
+
+# About
+
 [![Build Status](https://travis-ci.org/kaihendry/lk2.svg?branch=master)](https://travis-ci.org/kaihendry/lk2)
 
 A version 2 of [lk](https://github.com/kaihendry/lk) where I added the feature to Trash items.
