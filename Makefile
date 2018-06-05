@@ -1,4 +1,5 @@
 all: statik
+	go get
 	go build
 
 statik: clean
