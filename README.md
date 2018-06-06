@@ -2,6 +2,12 @@
 
 	curl -sfL https://install.goreleaser.com/github.com/kaihendry/lk2.sh | sh
 
+# Via Docker
+
+Binds to port 9000 by default
+
+	docker run -p 9000:9000 -v $YOUR_MEDIA_DIR:/media hendry/lk2 /go/bin/lk2 /media
+
 # About
 
 [![Build Status](https://travis-ci.org/kaihendry/lk2.svg?branch=master)](https://travis-ci.org/kaihendry/lk2)
