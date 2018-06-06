@@ -7,3 +7,10 @@ build:
     - linux
   goarch:
     - amd64
+
+dockers:
+- image: hendry/lk2
+  tag_templates:
+  - '{{ .Tag }}'
+  - 'v{{ .Major }}.{{ .Minor }}'
+  - 'latest'
