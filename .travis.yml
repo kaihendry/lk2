@@ -7,7 +7,10 @@ before_install:
 
 services:
     - docker
-      # calls goreleaser
+
+after_success:
+- test -n "$TRAVIS_TAG" && docker login -u=hendry -p="$DOCKER_PASSWORD"
+
 deploy:
     - provider: script
       skip_cleanup: true
