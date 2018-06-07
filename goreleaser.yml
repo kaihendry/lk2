@@ -7,15 +7,16 @@ build:
     - linux
   goarch:
     - amd64
+  env:
+    - CGO_ENABLED=0
 
 dockers:
   -
     image: hendry/lk2
     binary: lk2
-
-build:
-  env:
-    - CGO_ENABLED=0
+    tag_templates:
+     - "{{ .Tag }}"
+     - latest
 
 archive:
     format: binary
