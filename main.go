@@ -29,6 +29,12 @@ import (
 	"github.com/skratchdot/open-golang/open"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 var dirPath = "."
 var dirThumbs = fmt.Sprintf("%s%s", os.Getenv("HOME"), "/.cache/lk")
 var dirTrash = fmt.Sprintf("%s%s", os.Getenv("HOME"), "/.Trash")
@@ -59,6 +65,10 @@ func init() {
 	}
 }
 
+func showversion(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "%v, commit %v, built at %v", version, commit, date)
+}
+
 func main() {
 	flag.Parse()
 
@@ -71,6 +81,7 @@ func main() {
 
 	app.Get("/get", get)
 	app.Get("/t/", thumb)
+	app.Get("/version", showversion)
 	app.Post("/trash", trash)
 	app.Delete("/", delete)
 
