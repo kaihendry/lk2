@@ -12,3 +12,10 @@ dockers:
   -
     image: hendry/lk2
     binary: lk2
+
+build:
+  env:
+    - CGO_ENABLED=0
+
+archive:
+    format: binary
