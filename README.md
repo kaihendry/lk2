@@ -4,9 +4,9 @@
 
 # Via Docker
 
-Binds to port 9000 by default
+Binds to port 9000 by default.
 
-	docker run -p 9000:9000 -v $YOUR_MEDIA_DIR:/media hendry/lk2 /lk2 /media
+	docker run -p 9000:9000 -v $YOUR_MEDIA_DIR:/media hendry/lk2 /media
 
 # About
 
