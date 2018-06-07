@@ -1,3 +1,4 @@
 FROM scratch
 COPY lk2 /
+ENV PORT 9000
 ENTRYPOINT ["/lk2"]
