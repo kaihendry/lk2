@@ -2,9 +2,6 @@ language: go
 go:
     - tip
 
-before_install:
-    go get github.com/rakyll/statik
-
 services:
     - docker
 
